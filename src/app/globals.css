@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   COSDEP — design system
+   --------------------------------------------------------------------------
+   "Living green" — a warm, light, nature-forward palette built on the
+   organisation's leaf-green brand. Deep forest greens for trust and depth,
+   a vivid leaf accent for energy, and soft cream/sand neutrals that let the
+   field photography breathe.
+   Fonts: Poppins (display, continuity with the original brand) · Inter (body)
+   ========================================================================== */
+
+@theme {
+  /* Brand green — deep forest → bright leaf */
+  --color-forest-950: #06180e;
+  --color-forest-900: #0b2a17;
+  --color-forest-800: #103a20;
+  --color-forest-700: #16512c;
+  --color-forest-600: #1d6b39;
+  --color-forest-500: #2f9e44; /* primary green */
+  --color-forest-400: #40c057;
+  --color-forest-300: #69db7c;
+  --color-forest-200: #b2f2bb;
+  --color-forest-100: #d3f9d8;
+  --color-forest-50: #ebfbee;
+
+  /* Leaf — the vivid brand accent (from the original COSDEP palette) */
+  --color-leaf-600: #5aa722;
+  --color-leaf-500: #77cd38;
+  --color-leaf-400: #8fdb52;
+  --color-leaf-300: #aee66f;
+
+  /* Earth — warm sand & soil neutrals */
+  --color-sand-50: #faf9f4;
+  --color-sand-100: #f3f1e8;
+  --color-sand-200: #e7e3d6;
+  --color-soil-700: #6f6350;
+  --color-soil-800: #4a4235;
+
+  /* Ink — foreground text (green-tinted charcoal) */
+  --color-ink-900: #12211a; /* headings */
+  --color-ink-700: #24352c;
+  --color-ink-600: #3c4d43; /* body */
+  --color-ink-500: #5c6b62; /* muted */
+  --color-ink-400: #8a978e; /* faint / meta */
+
+  /* Surfaces */
+  --color-surface: #ffffff;
+  --color-canvas: #f7faf5; /* page background — a whisper of green */
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-poppins), var(--font-inter), ui-sans-serif, sans-serif;
+
+  --shadow-soft: 0 1px 2px rgba(16, 58, 32, 0.04), 0 8px 24px -12px rgba(16, 58, 32, 0.14);
+  --shadow-lift: 0 2px 4px rgba(16, 58, 32, 0.06), 0 20px 44px -18px rgba(16, 58, 32, 0.22);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink-600);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(119, 205, 56, 0.3);
+  color: var(--color-forest-900);
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 78rem; /* 1248px */
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Eyebrow / kicker — a small leaf-green label above a heading */
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-forest-600);
+  }
+  .kicker::before {
+    content: "";
+    width: 1.4rem;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--color-leaf-500), var(--color-forest-500));
+  }
+  .kicker-center::before {
+    display: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Organic leaf-shaped mask for feature imagery */
+  .mask-blob {
+    border-radius: 62% 38% 42% 58% / 54% 46% 54% 46%;
+  }
+
+  /* A soft green radial wash for hero / CTA bands */
+  .wash-green {
+    background:
+      radial-gradient(42rem 26rem at 82% -10%, rgba(64, 192, 87, 0.16), transparent 60%),
+      radial-gradient(38rem 24rem at 6% 110%, rgba(119, 205, 56, 0.14), transparent 58%);
+  }
+
+  /* Subtle dotted texture behind bands */
+  .bg-dots {
+    background-image: radial-gradient(rgba(29, 107, 57, 0.09) 1.2px, transparent 1.2px);
+    background-size: 22px 22px;
+  }
+
+  /* Card base */
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-sand-200);
+    border-radius: 1.25rem;
+    box-shadow: var(--shadow-soft);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Motion — compositor-safe, disabled under prefers-reduced-motion
+--------------------------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  will-change: transform, opacity;
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-up { transform: translateY(26px); }
+.reveal-left { transform: translateX(26px); }
+.reveal-right { transform: translateX(-26px); }
+.reveal-scale { transform: scale(0.95); }
+.reveal-in { opacity: 1; transform: none; }
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-18px); }
+}
+.float-slow {
+  animation: floatY 11s ease-in-out infinite;
+}
+
+/* Hero slide crossfade */
+.slide {
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.slide-active {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .float-slow { animation: none !important; }
+  html { scroll-behavior: auto; }
+}
