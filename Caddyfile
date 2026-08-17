@@ -9,10 +9,13 @@
 	root * /srv
 	encode zstd gzip
 
-	# The site is exported with trailingSlash, so every route is a folder with
-	# an index.html. Resolve both /about and /about/ to /about/index.html.
-	try_files {path} {path}/index.html
-	file_server
+	# The site is exported with trailingSlash, so every route is already a folder
+	# containing an index.html. file_server resolves those directly (and redirects
+	# /about to /about/), so no try_files rewriting is needed — adding one makes
+	# the bare "/" request resolve to the directory itself and return an empty body.
+	file_server {
+		index index.html
+	}
 
 	# Serve the exported 404 page for unknown routes.
 	handle_errors {
