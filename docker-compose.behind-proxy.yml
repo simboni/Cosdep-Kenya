@@ -1,0 +1,32 @@
+# Use this file INSTEAD of docker-compose.yml when the server already runs a
+# reverse proxy on ports 80/443 for another app (so those ports are taken).
+#
+#   docker compose -f docker-compose.behind-proxy.yml up -d --build
+#
+# The container publishes no ports. It serves plain HTTP on its internal port 80
+# and joins the proxy's docker network, so the existing proxy can reach it by
+# container name and terminate HTTPS on its behalf. In the proxy's config:
+#
+#   cosdepkenya.org {
+#           reverse_proxy cosdep-website:80
+#   }
+#
+# PROXY_NETWORK (in .env) is the docker network the existing proxy runs on.
+# Find it with: docker inspect <proxy-container> --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}'
+
+services:
+  web:
+    build: .
+    image: cosdep-website
+    container_name: cosdep-website
+    restart: unless-stopped
+    environment:
+      # Plain HTTP internally — the front proxy handles TLS.
+      SITE_ADDRESS: ":80"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:-riziki-pos_default}

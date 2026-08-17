@@ -95,6 +95,50 @@ Open **https://cosdepkenya.org** — you should see the site with a padlock. Don
 
 ---
 
+## If the server already runs another site on ports 80/443
+
+Only one program can hold ports 80 and 443 on an IP address. If the server
+already runs a reverse proxy for another app, this site can't take those ports —
+`docker compose up` fails with `Bind for 0.0.0.0:80 failed: port is already
+allocated`.
+
+The fix is to run this site **behind** the existing proxy. The apps stay fully
+separate (own containers, own data, own deploys); they only share the front door,
+which routes by domain name.
+
+**1. Start the site with no published ports, on the proxy's network:**
+
+```bash
+echo 'PROXY_NETWORK=riziki-pos_default' >> .env       # the proxy's docker network
+docker compose -f docker-compose.behind-proxy.yml up -d --build
+```
+
+**2. Add a site block to the existing proxy's config.** For Caddy:
+
+```
+cosdepkenya.org {
+	reverse_proxy cosdep-website:80
+	encode zstd gzip
+}
+
+www.cosdepkenya.org {
+	redir https://cosdepkenya.org{uri} permanent
+}
+```
+
+**3. Validate, then reload — never restart.** A reload keeps the other sites
+serving and refuses to apply a broken config; a restart would take them down:
+
+```bash
+docker exec <proxy-container> caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+docker exec <proxy-container> caddy reload  --config /etc/caddy/Caddyfile
+```
+
+Caddy fetches the HTTPS certificate for the new domain automatically, as soon as
+the domain's DNS points at this server.
+
+---
+
 ## Updating the site later
 
 Whenever the site's code changes (new content, fixes, etc.):
