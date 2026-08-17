@@ -18,6 +18,11 @@ RUN npm run build
 
 # ---------- Serve stage: Caddy serves ./out over HTTP/HTTPS ----------
 FROM caddy:2-alpine
+
+# Baseline address: plain HTTP, so `docker run` with no env still serves the
+# site. docker-compose overrides this with SITE_ADDRESS from .env (your domain).
+ENV SITE_ADDRESS=:80
+
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY --from=build /app/out /srv
 

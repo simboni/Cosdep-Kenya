@@ -5,7 +5,12 @@
 # SITE_ADDRESS decides how the site is served (set in .env):
 #   cosdepkenya.org www.cosdepkenya.org  → automatic HTTPS for those domains
 #   :80                                   → plain HTTP, for testing on a bare IP
-{$SITE_ADDRESS:-:80} {
+#
+# No inline default here: Caddy's default syntax is {$VAR:default}, so a shell
+# style {$VAR:-:80} is read as the literal hostname "-", which matches nothing
+# and makes every request return an empty 200. The Dockerfile sets ENV
+# SITE_ADDRESS=:80 as the baseline instead, and compose overrides it from .env.
+{$SITE_ADDRESS} {
 	root * /srv
 	encode zstd gzip
 
