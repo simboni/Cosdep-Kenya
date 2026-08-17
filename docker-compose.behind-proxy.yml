@@ -15,7 +15,11 @@
 # Find it with: docker inspect <proxy-container> --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}'
 
 services:
-  web:
+  # Named cosdep-website, not something generic like "web": compose publishes the
+  # service name as a network alias, and this container joins a network it does
+  # not own. A generic name would collide with the proxy's other apps (they
+  # already have a "web"), and docker would round-robin between them.
+  cosdep-website:
     build: .
     image: cosdep-website
     container_name: cosdep-website
