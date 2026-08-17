@@ -1,0 +1,27 @@
+# One command to build and run the site on your own server:
+#
+#   docker compose up -d --build
+#
+# Values come from a .env file next to this one (copy .env.example → .env first).
+
+services:
+  web:
+    build: .
+    image: cosdep-website
+    container_name: cosdep-website
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    environment:
+      SITE_ADDRESS: "${SITE_ADDRESS:-:80}"
+    volumes:
+      # Persist the Let's Encrypt certificates so they survive restarts /
+      # rebuilds (and you don't hit Let's Encrypt rate limits).
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
